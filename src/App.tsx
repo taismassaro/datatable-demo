@@ -1,44 +1,111 @@
-import { useState } from 'react'
-import logo from './logo.svg'
+
+
+import React from 'react'
+import { useMutation } from '@apollo/client'
+import * as yup from 'yup'
 import './App.css'
+import { DataTable } from './components'
+import { GET_POSTS, CREATE_POST, DELETE_POST } from './queries'
+import { loremIpsum } from 'lorem-ipsum'
+
+type DeletePostVariables = {
+  id: string
+}
+
+type Post = {
+  id: string
+  title: string
+  user: {
+    name: string
+  }
+}
+
+type QueryResult = {
+  posts: {
+    data: Post[]
+  }
+}
+
+function mapQueryToTable (data: QueryResult) {
+  const head = (
+    <>
+      <th>Id</th>
+      <th>Title</th>
+      <th>Written by</th>
+    </>
+  )
+
+  if (!data?.posts) { return { head, body: [], validationData: {} } }
+
+  const posts = data?.posts?.data
+
+  const body = posts.map((post: Post) => {
+    return {
+      data: {
+        id: post.id
+      },
+      content: (
+        <>
+          <td>{post.id}</td>
+          <td>{post.title}</td>
+          <td>{post.user?.name}</td>
+        </>
+      ),
+      rowActionParams: {
+        show: true,
+        variables: {
+          id: post.id
+        }
+      }
+    }
+  })
+
+  return {
+    head,
+    body,
+    validationData: { count: body?.length }
+  }
+}
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [deletePost, {
+    loading: deletePostLoading
+  }] = useMutation(DELETE_POST) 
+
+  function handleDeletePost ({ id }: DeletePostVariables) {
+    deletePost({
+      variables: {
+        id
+      },
+      refetchQueries: [{ query: GET_POSTS }]
+    })
+  }
 
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>Hello Vite + React!</p>
-        <p>
-          <button type="button" onClick={() => setCount((count) => count + 1)}>
-            count is: {count}
-          </button>
-        </p>
-        <p>
-          Edit <code>App.tsx</code> and save to test HMR updates.
-        </p>
-        <p>
-          <a
-            className="App-link"
-            href="https://reactjs.org"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Learn React
-          </a>
-          {' | '}
-          <a
-            className="App-link"
-            href="https://vitejs.dev/guide/features.html"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Vite Docs
-          </a>
-        </p>
+    <main className="App">
+      <header>
+        <h1>DataTable demo</h1>
       </header>
-    </div>
+
+      <DataTable
+        queryGetItems={GET_POSTS}
+        emptyTableText='No posts generated yet.'
+        mapQueryToTableRows={mapQueryToTable}
+        addRow={{
+          mutation: CREATE_POST,
+          variables: { title: loremIpsum({ count: 5, units: 'words' }), body: loremIpsum({ count: 3, units: 'words' })},
+          buttonText: 'Generate post',
+          validationSchema: yup.object().shape({
+            itemsCount: yup.number().lessThan(5, 'You can only have 5 posts at the same time.')
+          })
+        }}
+        rowAction={{
+          label: 'Delete post',
+          loading: deletePostLoading,
+          action: handleDeletePost,
+        }}
+      />
+    </main>
   )
 }
 
