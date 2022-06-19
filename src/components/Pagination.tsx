@@ -7,8 +7,8 @@ const PaginationContainer = styled.div`
   align-items: center;
   justify-content: flex-end;
 `
-const Spacer = styled.div`
-  width: 8px;
+const SpacerHorizontal = styled.div`
+  width: 1rem;
 `
 
 function Pagination ({
@@ -36,7 +36,7 @@ function Pagination ({
         <>
           {`${currentPageStart}–${currentPageEnd} of ${total}`}
         </>}
-        <Spacer />
+        <SpacerHorizontal />
       <button
         disabled={currentPage <= 1 || total === 0}
         onClick={handleGoToPrevious}

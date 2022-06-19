@@ -2,7 +2,7 @@ import React from 'react'
 import { format } from 'date-fns'
 import { useMutation } from '@apollo/client'
 import * as yup from 'yup'
-import { DataTable } from './components'
+import { DataTable, TableHeadCell, TableBodyCell } from './components'
 import { GET_CREDENTIALS, CREATE_CREDENTIAL, DELETE_CREDENTIAL } from './queries'
 import { QueryResult, Credential, DeleteCredentialVariables } from './types'
 import styled from 'styled-components'
@@ -20,9 +20,9 @@ const Header = styled.header`
 function mapQueryToTable (data: QueryResult) {
   const head = (
     <>
-      <th>Id</th>
-      <th>Username</th>
-      <th>Created at</th>
+      <TableHeadCell>Id</TableHeadCell>
+      <TableHeadCell>Username</TableHeadCell>
+      <TableHeadCell>Created at</TableHeadCell>
     </>
   )
 
@@ -37,9 +37,9 @@ function mapQueryToTable (data: QueryResult) {
       },
       content: (
         <>
-          <td>{credential.id}</td>
-          <td>{credential.username}</td>
-          <td>{format(new Date(credential.createdAt), 'PPP')}</td>
+          <TableBodyCell>{credential.id}</TableBodyCell>
+          <TableBodyCell>{credential.username}</TableBodyCell>
+          <TableBodyCell>{format(new Date(credential.createdAt), 'yyyy-MM-dd')}</TableBodyCell>
         </>
       ),
       rowActionParams: {
