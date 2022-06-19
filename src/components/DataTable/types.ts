@@ -12,7 +12,7 @@ interface AddRowProps {
   buttonText: string
   validationSchema?: ObjectSchema // yup schema
   mutation: DocumentNode // graphql mutation to add item
-  variables: Record<string, any>
+  variables?: Record<string, any>
 }
 
 interface RowActionProps {
@@ -43,7 +43,7 @@ export interface AddRowComponentProps {
   refetchQuery: DocumentNode
   queryVariables?: Record<string, any>
   mutation: DocumentNode
-  mutationVariables: Record<string, any>
+  mutationVariables?: Record<string, any>
 }
 
 /* ----------------------------- RowAction ---------------------------- */

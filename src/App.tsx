@@ -4,56 +4,52 @@ import React from 'react'
 import { useMutation } from '@apollo/client'
 import * as yup from 'yup'
 import { DataTable } from './components'
-import { GET_POSTS, CREATE_POST, DELETE_POST } from './queries'
-import { loremIpsum } from 'lorem-ipsum'
+import { DELETE_POST, GET_CREDENTIALS, CREATE_CREDENTIAL } from './queries'
+import { format } from 'date-fns'
 
 type DeletePostVariables = {
   id: string
 }
 
-type Post = {
+type Credential = {
   id: string
-  title: string
-  user: {
-    name: string
-  }
+  createdAt: string
+  username: string
 }
 
 type QueryResult = {
-  posts: {
-    data: Post[]
-  }
+  getCredentials: Credential[]
 }
 
 function mapQueryToTable (data: QueryResult) {
   const head = (
     <>
       <th>Id</th>
-      <th>Title</th>
-      <th>Written by</th>
+      <th>Username</th>
+      <th>Created at</th>
     </>
   )
 
-  if (!data?.posts) { return { head, body: [], validationData: {} } }
+  if (!data?.getCredentials) { return { head, body: [], validationData: {} } }
 
-  const posts = data?.posts?.data
+  const credentials = data?.getCredentials
 
-  const body = posts.map((post: Post) => {
+  const body = credentials.map((credential: Credential) => {
     return {
       data: {
-        id: post.id
+        id: credential.id
       },
       content: (
         <>
-          <td>{post.id}</td>
-          <td>{post.title}</td>
-          <td>{post.user?.name}</td>
+          <td>{credential.id}</td>
+          <td>{credential.username}</td>
+          <td>{format(new Date(credential.createdAt), 'PPP')}</td>
         </>
       ),
       rowActionParams: {
         show: true,
         variables: {
-          id: post.id
+          id: credential.id
         }
       }
     }
@@ -76,7 +72,7 @@ function App() {
       variables: {
         id
       },
-      refetchQueries: [{ query: GET_POSTS }]
+      refetchQueries: [{ query: GET_CREDENTIALS }]
     })
   }
 
@@ -87,15 +83,14 @@ function App() {
       </header>
 
       <DataTable
-        queryGetItems={GET_POSTS}
-        emptyTableText='No posts generated yet.'
+        queryGetItems={GET_CREDENTIALS}
+        emptyTableText='No credentials generated yet.'
         mapQueryToTableRows={mapQueryToTable}
         addRow={{
-          mutation: CREATE_POST,
-          variables: { title: loremIpsum({ count: 5, units: 'words' }), body: loremIpsum({ count: 3, units: 'words' })},
-          buttonText: 'Generate post',
+          mutation: CREATE_CREDENTIAL,
+          buttonText: 'Generate credential',
           validationSchema: yup.object().shape({
-            itemsCount: yup.number().lessThan(5, 'You can only have 5 posts at the same time.')
+            count: yup.number().lessThan(5, 'You can only have 5 credentials at the same time.')
           })
         }}
         rowAction={{

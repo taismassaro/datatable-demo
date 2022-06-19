@@ -1,5 +1,5 @@
 import { faker } from '@faker-js/faker'
-import { addMocksToSchema } from '@graphql-tools/mock'
+import { addMocksToSchema, createMockStore, IMockStore } from '@graphql-tools/mock'
 import { makeExecutableSchema } from '@graphql-tools/schema'
 
 const typeDefs = `
@@ -24,30 +24,39 @@ const typeDefs = `
   }
 `
 
+const schema = makeExecutableSchema({ typeDefs })
+const store = createMockStore({ schema })
+
 const generateCredential = () => ({
   id: faker.datatype.uuid(),
-  createdAt: faker.date.past(),
+  createdAt: faker.date.past().toString(),
   username: faker.internet.userName()
 })
 
-let credentials = Array.from({ length: 3 }, generateCredential)
+store.set('Query', 'ROOT', 'getCredentials', Array.from({ length: 3 }, generateCredential))
 
 const mocks = {
-  Credential: () => ({
-    id: faker.datatype.uuid(),
-    createdAt: faker.date.past(),
-    username: faker.internet.userName()
-  }),
+  Credential: generateCredential,
   Query: () => ({
-    getCredentials: () => credentials
+    getCredentials: () => store.get('Query', 'ROOT', 'getCredentials') as Credential[]
   }),
   Mutation: () => ({
-    createCredential: () => generateCredential()
+    createCredential: () => {}
   })
 }
 
-const schema = makeExecutableSchema({ typeDefs })
+const resolvers = (store: IMockStore) => ({
+  Mutation: {
+    createCredential: () => {
+      const newCredential = generateCredential()
+      const credentials = store.get('Query', 'ROOT', 'getCredentials') as Credential[]
+      store.set('Query', 'ROOT', 'getCredentials', [...credentials, newCredential])
 
-const schemaWithMocks = addMocksToSchema({ schema, mocks })
+      return newCredential
+    }
+  }
+})
+
+const schemaWithMocks = addMocksToSchema({ schema, mocks, resolvers })
 
 export default schemaWithMocks
