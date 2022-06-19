@@ -1,23 +1,21 @@
 import React from 'react'
 import { RowActionComponentProps } from './types'
 
-const RowAction = ({
+function RowAction ({
   label,
   rowData,
   onConfirm,
   disabled,
-}: RowActionComponentProps) => {
+}: RowActionComponentProps) {
 
-  const handleClick = () => {
+  function handleClick () {
     onConfirm({ variables: rowData.variables })
   }
 
   return (
-    <>
-      <button onClick={handleClick} disabled={disabled}>
-        {label}
-      </button>
-    </>
+    <button onClick={handleClick} disabled={disabled}>
+      {label}
+    </button>
   )
 }
 

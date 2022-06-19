@@ -1,25 +1,21 @@
-
-
 import React from 'react'
+import { format } from 'date-fns'
 import { useMutation } from '@apollo/client'
 import * as yup from 'yup'
 import { DataTable } from './components'
 import { GET_CREDENTIALS, CREATE_CREDENTIAL, DELETE_CREDENTIAL } from './queries'
-import { format } from 'date-fns'
+import { QueryResult, Credential, DeleteCredentialVariables } from './types'
+import styled from 'styled-components'
 
-type DeleteCredentialVariables = {
-  id: string
-}
+const RootContainer = styled.main`
+  padding: 2rem;
+  background-color: #f1f3f5;
+  height: 100%;
+`
 
-type Credential = {
-  id: string
-  createdAt: string
-  username: string
-}
-
-type QueryResult = {
-  getCredentials: Credential[]
-}
+const Header = styled.header`
+  text-align: center;
+`
 
 function mapQueryToTable (data: QueryResult) {
   const head = (
@@ -62,7 +58,7 @@ function mapQueryToTable (data: QueryResult) {
   }
 }
 
-function App() {
+function Demo () {
   const [deleteCredential, {
     loading: deleteCredentialLoading
   }] = useMutation(DELETE_CREDENTIAL) 
@@ -77,10 +73,10 @@ function App() {
   }
 
   return (
-    <main className="App">
-      <header>
+    <RootContainer>
+      <Header>
         <h1>DataTable demo</h1>
-      </header>
+      </Header>
 
       <DataTable
         queryGetItems={GET_CREDENTIALS}
@@ -99,8 +95,8 @@ function App() {
           action: handleDeleteCredential,
         }}
       />
-    </main>
+    </RootContainer>
   )
 }
 
-export default App
+export default Demo

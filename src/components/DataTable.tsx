@@ -1,10 +1,10 @@
 import React, { useState } from 'react'
 import { useQuery } from '@apollo/client'
-import styled from 'styled-components'
-import Pagination from '../Pagination'
+import Pagination from './Pagination'
 import { DataTableProps } from './types'
 import RowAction from './RowAction'
 import AddRow from './AddRow'
+import styled from 'styled-components'
 
 const PAGE_SIZE = 10
 
@@ -21,6 +21,14 @@ const LoadingOverlay = styled.div`
   opacity: 0.5;
 `
 
+const TableContainer = styled.div`
+  position: relative;
+  background-color: #f8f9fa;
+  padding: 1rem;
+  border: 1px solid #dee2e6;
+  border-radius: .5rem;
+`
+
 function DataTable ({
   // LIST ITEMS
   queryGetItems,
@@ -35,12 +43,16 @@ function DataTable ({
 }: DataTableProps) {
 
   // Load table data
-  const { loading, data } = useQuery(queryGetItems, { variables: queryVariables, ...additionalQueryOptions })
+  const { loading, data } = useQuery(queryGetItems, { 
+    variables: queryVariables, ...additionalQueryOptions 
+  })
+
   const { head, body, validationData } = mapQueryToTableRows(data)
 
   // Add row mutation states
-  const [addRowError, setAddRowError] = useState<string>('')
+  const [addRowError, setAddRowError] = useState('')
 
+  // Pagination
   const [pageIndex, setPageIndex] = useState(1)
   const page = body?.slice(0 + PAGE_SIZE * (pageIndex - 1), PAGE_SIZE * pageIndex)
 
@@ -81,7 +93,7 @@ function DataTable ({
   }
 
   return (
-    <div style={{ position: 'relative' }}>
+    <TableContainer>
       {/* Set loading state to table when performing row action */}
       {rowAction?.loading && (
         <LoadingOverlay>
@@ -132,8 +144,8 @@ function DataTable ({
         </>
       ) : (
         emptyTableText
-        )}
-    </div>
+      )}
+    </TableContainer>
   )
 }
 

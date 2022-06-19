@@ -1,6 +1,8 @@
+import { QueryHookOptions } from '@apollo/client'
 import { DocumentNode } from 'graphql'
 import { ObjectSchema } from 'yup'
-import { QueryHookOptions } from '@apollo/client'
+
+// DataTable
 
 interface TableData {
   head: any
@@ -18,12 +20,11 @@ interface AddRowProps {
 interface RowActionProps {
   label: string
   loading?: boolean
-  // function to be called by row action
-  action: (args: any) => void
+  action: (args: any) => void // function to be called by row action
 }
 
 export interface DataTableProps {
-  queryGetItems: DocumentNode // graphql query
+  queryGetItems: DocumentNode // graphql query to fetch table items
   queryVariables?: Record<string, any>
   emptyTableText: string
   addRow?: AddRowProps
@@ -32,7 +33,7 @@ export interface DataTableProps {
   additionalQueryOptions?: QueryHookOptions
 }
 
-/* ------------------------------ AddRow ------------------------------ */
+// AddRowButton
 
 export interface AddRowComponentProps {
   buttonText: string
@@ -46,7 +47,7 @@ export interface AddRowComponentProps {
   mutationVariables?: Record<string, any>
 }
 
-/* ----------------------------- RowAction ---------------------------- */
+// RowActionButton
 
 interface RowData {
   data: Record<string, string>
@@ -58,4 +59,13 @@ export interface RowActionComponentProps {
   rowData: RowData
   onConfirm: ({ variables }: { variables: Record<string, string>}) => void
   disabled: boolean
+}
+
+// Pagination
+
+export interface PaginationProps {
+  onChange?: (page: number) => void
+  current: number
+  size?: number
+  total: number
 }

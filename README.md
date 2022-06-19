@@ -1,3 +1,30 @@
+# Settings Toolkit
+
+The Settings Toolkit is a set of components intended for building settings' pages in Merchant Portal. These components should make it easy for all teams to implement high-quality, maintainable settings without huge engineering efforts.
+
+Layout components will help you give a unified look and feel in your settings pages with no effort.
+
+Forms can be easily built using the toolkit wrappers provided here, and you can use all the field components from the support library `formik-fields`.
+
+---
+
+- [Form Components](#form-components)
+  - [DataTable](#datatable)
+
+---
+
+## Form Components
+
+We use [Formik](https://formik.org/docs/overview) to manage the state of our forms, which means that each field is identified by a name and automatically hooked up to validation, error-reporting and data fetching. We provide field components that can be used with formik, these are thin wrappers around bubble-ui components so the bubble-ui documentation still applies. For validation we use [yup](https://github.com/jquense/yup) validation schemas.
+
+On top of this, we added an abstraction for dataloading and form submissions. The settings backend uses graphql, so you will have to add one graphql query for loading the initial data, and one graphql mutation for submitting your form.
+
+The result of your graphql query can be transformed with `mapQueryToFormik`. You should return an object where each key is a fieldname and the value is your initial field value (nesting is possible).
+![data fetching with mapQueryToFormik](./assets/mapQueryToFormik.png)
+
+In case of the mutation you have to pass a function that gets your formik state as an input (`mapFormikToMutationInput`) and maps it into mutation variables. This makes it possible to transform your form state during submit.
+![form submission with mapFormikToMutationInput](./assets/mapFormikToMutationInput.png)
+
 # DataTable
 
 Use this component to render a table and populate it with data from a GraphQL API.
@@ -27,23 +54,23 @@ const GET_DATA = gql`
 function mapQueryToTableRows(data) {
   const head = {
     colum1: "First column",
-    column2: "Second column"
+    column2: "Second column",
   };
   const body = [
     {
       column1: {
         type: TableBodyCellType.text,
-        text: data.value1
+        text: data.value1,
       },
       column2: {
         type: TableBodyCellType.text,
-        text: data.value2
-      }
-    }
+        text: data.value2,
+      },
+    },
   ];
   return {
     head,
-    body
+    body,
   };
 }
 
@@ -84,19 +111,19 @@ const ADD_ITEM = gql`
 function mapQueryToTableRows(data) {
   const head = {
     colum1: "First column",
-    column2: "Second column"
+    column2: "Second column",
   };
   const body = [
     {
       column1: {
         type: TableBodyCellType.text,
-        text: data.value1
+        text: data.value1,
       },
       column2: {
         type: TableBodyCellType.text,
-        text: data.value2
-      }
-    }
+        text: data.value2,
+      },
+    },
   ];
   return {
     head,
@@ -106,8 +133,8 @@ function mapQueryToTableRows(data) {
       performing the mutation to add a new item to the table 
     */
     validationData: {
-      maxItems: body.length
-    }
+      maxItems: body.length,
+    },
   };
 }
 
@@ -124,8 +151,8 @@ function mapQueryToTableRows(data) {
       Yup schema to validate against
     */
     validationSchema: yup.object().shape({
-      maxItems: yup.number().max(5, "Validation error message")
-    })
+      maxItems: yup.number().max(5, "Validation error message"),
+    }),
   }}
 />;
 ```
@@ -150,17 +177,17 @@ const GET_DATA = gql`
 function mapQueryToTableRows(data) {
   const head = {
     colum1: "First column",
-    column2: "Second column"
+    column2: "Second column",
   };
   const body = [
     {
       column1: {
         type: TableBodyCellType.text,
-        text: data.value1
+        text: data.value1,
       },
       column2: {
         type: TableBodyCellType.text,
-        text: data.value2
+        text: data.value2,
       },
       /*
         Control whether the action should be visible for this row
@@ -171,9 +198,9 @@ function mapQueryToTableRows(data) {
           Variables can also be passed here in case 
           they're needed for the action
         */
-        variables: {}
-      }
-    }
+        variables: {},
+      },
+    },
   ];
   return {
     head,
@@ -183,8 +210,8 @@ function mapQueryToTableRows(data) {
       performing the mutation to add a new item to the table 
     */
     validationData: {
-      maxItems: body.length
-    }
+      maxItems: body.length,
+    },
   };
 }
 
@@ -201,7 +228,7 @@ function handleRowAction() {
   mapQueryToTableRows={mapQueryToTableRows}
   rowAction={{
     label: "Action",
-    action: handleRowAction
+    action: handleRowAction,
   }}
 />;
 ```

@@ -1,12 +1,6 @@
 import React from 'react'
 import styled from 'styled-components'
-
-interface PaginationProps {
-  onChange?: (page: number) => void
-  current: number
-  size?: number
-  total: number
-}
+import { PaginationProps } from './types'
 
 const PaginationContainer = styled.div`
   display: flex;
@@ -28,11 +22,11 @@ function Pagination ({
   const currentPageStart = (currentPage - 1) * size + 1
   const currentPageEnd = Math.min(currentPage * size, total)
 
-  const handleGoToPrevious = () => {
+  function handleGoToPrevious () {
     onChange(current - 1)
   }
 
-  const handleGoToNext = () => {
+  function handleGoToNext () {
     onChange(current + 1)
   }
 
