@@ -33,7 +33,7 @@ export interface DataTableProps {
   additionalQueryOptions?: QueryHookOptions
 }
 
-// AddRowButton
+// AddRow
 
 export interface AddRowComponentProps {
   buttonText: string

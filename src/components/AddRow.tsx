@@ -3,8 +3,32 @@ import { useApolloClient } from '@apollo/client'
 import styled from 'styled-components'
 import { AddRowComponentProps } from './types'
 
-const WarningBlock = styled.div`
-  padding: 8px;
+const AddRowContainer = styled.div`
+  display: flex;
+  align-items: center;
+`
+
+const PrimaryButton = styled.button`
+  padding: .5rem;
+  background-color: #343a40;
+  border: none;
+  border-radius: .25rem;
+  font-size: 1rem;
+  color: #f8f9fa;
+
+  :hover {
+    background-color: #212529;
+    cursor: pointer;
+  }
+  `
+
+const ErrorContainer = styled.div`
+  margin-left: 1rem;
+  padding: .5rem;
+  background-color: #ffe3e3;
+  border: 1px solid #ff8787;
+  border-radius: .25rem; 
+  color: #c92a2a;
 `
 
 function AddRow ({
@@ -52,18 +76,18 @@ function AddRow ({
   }
 
   return (
-    <div style={{ display: 'flex', alignItems: 'center' }}>
-      <button
+    <AddRowContainer>
+      <PrimaryButton
         data-testid='datatable-add'
         onClick={handleClick}
       >
         {buttonText}
-      </button>
+      </PrimaryButton>
 
       {(loading) && 'Loading...'}
 
-      {error && <WarningBlock>{error}</WarningBlock>}
-    </div>
+      {error && <ErrorContainer>{error}</ErrorContainer>}
+    </AddRowContainer>
   )
 }
 
