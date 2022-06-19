@@ -1,23 +1,25 @@
 import React from 'react'
-import { render, screen, waitFor, fireEvent } from '@testing-library/react'
-import '@testing-library/jest-dom'
 import { MockedProvider, MockedResponse } from '@apollo/client/testing'
 import { gql } from '@apollo/client'
+import '@testing-library/jest-dom'
+import { render, screen } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import * as yup from 'yup'
 import DataTable from '../DataTable'
 
 function createTestWrapper (mocks: MockedResponse[]) {
   return function TestWrapper ({ children }: { children: React.ReactNode }) {
     return (
-        <MockedProvider mocks={mocks} addTypename={false}>
-          {children}
-        </MockedProvider>
+      <MockedProvider mocks={mocks} addTypename={false}>
+        {children}
+      </MockedProvider>
     )
   }
 }
 
 const MOCK_QUERY = gql`query mockQuery { MockQuery { id } }`
 const MOCK_MUTATION = gql`mutation mockMutation { MockMutation { id } }`
+
 const initialDataMock = jest.fn(() => ({
   data: {
     MockQuery: {
@@ -25,6 +27,7 @@ const initialDataMock = jest.fn(() => ({
     }
   }
 }))
+
 const mutationResultMock = jest.fn(() => ({
   data: {
     MockMutation: {
@@ -32,6 +35,7 @@ const mutationResultMock = jest.fn(() => ({
     }
   }
 }))
+
 const mocks = [
   {
     request: {
@@ -115,7 +119,7 @@ describe('DataTable', () => {
     expect(await screen.findByText('table is empty')).toBeInTheDocument()
   })
 
-  it('runs query for initial data on first render', async () => {
+  it('runs query for initial data on first render', () => {
     render(
       <DataTable
         mapQueryToTableRows={jest.fn(() => tableData)}
@@ -130,9 +134,7 @@ describe('DataTable', () => {
       { wrapper: createTestWrapper(mocks) }
     )
 
-    await waitFor(() => {
-      expect(initialDataMock).toHaveBeenCalled()
-    })
+    expect(initialDataMock).toHaveBeenCalled()
   })
 
   it('renders the query data as table rows', async () => {
@@ -152,14 +154,14 @@ describe('DataTable', () => {
       { wrapper: createTestWrapper(mocks) }
     )
 
-    await waitFor(() => {
-      expect(mapQueryToTableRows).toHaveBeenCalled()
-      expect(screen.getByText('first row data')).toBeInTheDocument()
-    })
+    expect(await screen.findByText('first row data')).toBeInTheDocument()
+    expect(mapQueryToTableRows).toHaveBeenCalled()
   })
 
   describe('when adding a row', () => {
     it('runs mutation on submit', async () => {
+      const user = userEvent.setup()
+
       render(
         <DataTable
           mapQueryToTableRows={jest.fn(() => tableData)}
@@ -174,16 +176,16 @@ describe('DataTable', () => {
         { wrapper: createTestWrapper(mocks) }
       )
 
-      await screen.findByRole('button', { name: 'add button' })
+      const addButton = await screen.findByRole('button', { name: 'add button' })
 
-      fireEvent.click(screen.getByRole('button', { name: 'add button' }))
+      await user.click(addButton)
 
-      await waitFor(() => {
-        expect(mutationResultMock).toHaveBeenCalled()
-      })
+      expect(mutationResultMock).toHaveBeenCalled()
     })
 
     it('shows error message if mutation fails', async () => {
+      const user = userEvent.setup()
+
       const mocksWithError = [
         {
           request: {
@@ -213,15 +215,17 @@ describe('DataTable', () => {
         { wrapper: createTestWrapper(mocksWithError) }
       )
 
-      await screen.findByRole('button', { name: 'add button' })
+      const addButton = await screen.findByRole('button', { name: 'add button' })
 
-      fireEvent.click(screen.getByRole('button', { name: 'add button' }))
+      await user.click(addButton)
 
       expect(await screen.findByText(/An error occurred/)).toBeInTheDocument()
     })
 
     describe('validation', () => {
       it('runs validation on submit and shows error', async () => {
+        const user = userEvent.setup()
+
         const invalidTableData = {
           ...tableData,
           validationData: { one: 'invalid' }
@@ -242,9 +246,9 @@ describe('DataTable', () => {
           { wrapper: createTestWrapper(mocks) }
         )
 
-        await screen.findByRole('button', { name: 'add button' })
+        const addButton = await screen.findByRole('button', { name: 'add button' })
 
-        fireEvent.click(screen.getByRole('button', { name: 'add button' }))
+        await user.click(addButton)
 
         expect(await screen.findByText('this is an error')).toBeInTheDocument()
       })
@@ -255,6 +259,8 @@ describe('DataTable', () => {
     const rowActionMock = jest.fn()
 
     it('runs mutation on submit', async () => {
+      const user = userEvent.setup()
+
       render(
         <DataTable
           mapQueryToTableRows={jest.fn(() => tableData)}
@@ -267,13 +273,12 @@ describe('DataTable', () => {
         />,
         { wrapper: createTestWrapper(mocks) }
       )
-      await screen.findByText(/Row action/)
 
-      fireEvent.click(screen.getByText(/Row action/))
+      const rowActionButton = await screen.findByText(/Row action/)
 
-      await waitFor(() => {
-        expect(rowActionMock).toHaveBeenCalled()
-      })
+      await user.click(rowActionButton)
+
+      expect(rowActionMock).toHaveBeenCalled()
     })
   })
 })
