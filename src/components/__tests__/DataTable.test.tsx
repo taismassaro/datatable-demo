@@ -1,21 +1,17 @@
 import React from 'react'
 import { render, screen, waitFor, fireEvent } from '@testing-library/react'
 import '@testing-library/jest-dom'
-import { MockedProvider } from '@apollo/client/testing'
+import { MockedProvider, MockedResponse } from '@apollo/client/testing'
 import { gql } from '@apollo/client'
 import * as yup from 'yup'
-import { DesignVersionProvider, ParticleDesignVersions } from 'mage-deps/@klarna/bubble-ui'
-import { HeaderTextCell, BodyTextCell } from 'mage-deps/@klarna/mp-ui'
-import { DataTable } from '../DataTable'
+import DataTable from '../DataTable'
 
-function createTestWrapper (mocks) {
-  return function TestWrapper ({ children }) {
+function createTestWrapper (mocks: MockedResponse[]) {
+  return function TestWrapper ({ children }: { children: React.ReactNode }) {
     return (
-      <DesignVersionProvider value={ParticleDesignVersions.NEXT}>
         <MockedProvider mocks={mocks} addTypename={false}>
           {children}
         </MockedProvider>
-      </DesignVersionProvider>
     )
   }
 }
@@ -60,16 +56,16 @@ const mocks = [
 const tableData = {
   head: (
     <>
-      <HeaderTextCell>first column header</HeaderTextCell>
-      <HeaderTextCell>second column header</HeaderTextCell>
+      <th>first column header</th>
+      <th>second column header</th>
     </>
   ),
   body: [
     {
       content: (
         <>
-          <BodyTextCell>first row data</BodyTextCell>
-          <BodyTextCell>second row data</BodyTextCell>
+          <td>first row data</td>
+          <td>second row data</td>
         </>
       ),
       rowActionParams: {
@@ -224,90 +220,6 @@ describe('DataTable', () => {
       expect(await screen.findByText(/An error occurred/)).toBeInTheDocument()
     })
 
-    describe('with modals', () => {
-      it('shows confirmation modal on click', async () => {
-        render(
-          <DataTable
-            mapQueryToTableRows={jest.fn(() => tableData)}
-            queryGetItems={MOCK_QUERY}
-            emptyTableText='table is empty'
-            addRow={{
-              buttonText: 'add button',
-              mutation: MOCK_MUTATION,
-              variables: {},
-              confirmationModalProps: {
-                title: 'Please confirm',
-                confirmButtonText: 'Confirm'
-              }
-            }}
-          />,
-          { wrapper: createTestWrapper(mocks) }
-        )
-
-        await screen.findByRole('button', { name: 'add button' })
-
-        fireEvent.click(screen.getByRole('button', { name: 'add button' }))
-
-        expect(await screen.findByText(/Please confirm/)).toBeInTheDocument()
-      })
-
-      it('calls mutation on modal submit', async () => {
-        render(
-          <DataTable
-            mapQueryToTableRows={jest.fn(() => tableData)}
-            queryGetItems={MOCK_QUERY}
-            emptyTableText='table is empty'
-            addRow={{
-              buttonText: 'add button',
-              mutation: MOCK_MUTATION,
-              variables: {},
-              confirmationModalProps: {
-                title: 'Please confirm',
-                confirmButtonText: 'Confirm'
-              }
-            }}
-          />,
-          { wrapper: createTestWrapper(mocks) }
-        )
-
-        await screen.findByRole('button', { name: 'add button' })
-
-        fireEvent.click(screen.getByRole('button', { name: 'add button' }))
-
-        await screen.findByText(/Please confirm/)
-
-        fireEvent.click(screen.getByRole('button', { name: /Confirm/ }))
-
-        await waitFor(() => {
-          expect(mutationResultMock).toHaveBeenCalled()
-        })
-      })
-
-      it('shows success modal, passing the data returned by mutation', async () => {
-        render(
-          <DataTable
-            mapQueryToTableRows={jest.fn(() => tableData)}
-            queryGetItems={MOCK_QUERY}
-            emptyTableText='table is empty'
-            addRow={{
-              buttonText: 'add button',
-              mutation: MOCK_MUTATION,
-              variables: {},
-              // eslint-disable-next-line react/display-name
-              SuccessModal: () => (<div>it worked!</div>)
-            }}
-          />,
-          { wrapper: createTestWrapper(mocks) }
-        )
-
-        await screen.findByRole('button', { name: 'add button' })
-
-        fireEvent.click(screen.getByRole('button', { name: 'add button' }))
-
-        expect(await screen.findByText('it worked!')).toBeInTheDocument()
-      })
-    })
-
     describe('validation', () => {
       it('runs validation on submit and shows error', async () => {
         const invalidTableData = {
@@ -361,72 +273,6 @@ describe('DataTable', () => {
 
       await waitFor(() => {
         expect(rowActionMock).toHaveBeenCalled()
-      })
-    })
-
-    describe('with confirmation modal', () => {
-      it('shows confirmation modal on click', async () => {
-        render(
-          <DataTable
-            mapQueryToTableRows={jest.fn(() => tableData)}
-            queryGetItems={MOCK_QUERY}
-            emptyTableText='table is empty'
-            rowAction={{
-              label: 'Row action',
-              action: () => ({}),
-              confirmationModalProps: {
-                title: 'Confirmation modal',
-                confirmButtonText: 'Confirm',
-                // eslint-disable-next-line react/display-name
-                content: () => (
-                  <div>Please confirm this row action</div>
-                )
-              }
-            }}
-          />,
-          { wrapper: createTestWrapper(mocks) }
-        )
-
-        await screen.findByText(/Row action/)
-
-        fireEvent.click(screen.getByText(/Row action/))
-
-        expect(await screen.findByText(/Please confirm this row action/)).toBeInTheDocument()
-      })
-
-      it('calls mutation on modal submit', async () => {
-        render(
-          <DataTable
-            mapQueryToTableRows={jest.fn(() => tableData)}
-            queryGetItems={MOCK_QUERY}
-            emptyTableText='table is empty'
-            rowAction={{
-              label: 'Row action',
-              action: () => ({}),
-              confirmationModalProps: {
-                title: 'Confirmation modal',
-                confirmButtonText: 'Confirm',
-                // eslint-disable-next-line react/display-name
-                content: () => (
-                  <div>Please confirm this row action</div>
-                )
-              }
-            }}
-          />,
-          { wrapper: createTestWrapper(mocks) }
-        )
-
-        await screen.findByText('Row action')
-
-        fireEvent.click(screen.getByText('Row action'))
-
-        await screen.findByText('Please confirm this row action')
-
-        fireEvent.click(screen.getByRole('button', { name: /Confirm/ }))
-
-        await waitFor(() => {
-          expect(rowActionMock).toHaveBeenCalled()
-        })
       })
     })
   })
