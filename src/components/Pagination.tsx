@@ -1,14 +1,13 @@
 import React from 'react'
 import styled from 'styled-components'
+import { BaseButton } from './styled/Button'
+import { SpacerHorizontal } from './styled/Spacer'
 import { PaginationProps } from './types'
 
 const PaginationContainer = styled.div`
   display: flex;
   align-items: center;
   justify-content: flex-end;
-`
-const SpacerHorizontal = styled.div`
-  width: 1rem;
 `
 
 function Pagination ({
@@ -37,18 +36,18 @@ function Pagination ({
           {`${currentPageStart}–${currentPageEnd} of ${total}`}
         </>}
         <SpacerHorizontal />
-      <button
+      <BaseButton
         disabled={currentPage <= 1 || total === 0}
         onClick={handleGoToPrevious}
       >
         {'<'}
-      </button>
-      <button
+      </BaseButton>
+      <BaseButton
         disabled={currentPage === lastPage || total === 0}
         onClick={handleGoToNext}
       >
         {'>'}
-      </button>
+      </BaseButton>
     </PaginationContainer>
   )
 }

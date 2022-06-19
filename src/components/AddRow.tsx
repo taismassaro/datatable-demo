@@ -1,34 +1,13 @@
 import React, { useState } from 'react'
 import { useApolloClient } from '@apollo/client'
 import styled from 'styled-components'
+import { BaseButton } from './styled/Button'
+import { ErrorBlock } from './styled/ErrorBlock'
 import { AddRowComponentProps } from './types'
 
 const AddRowContainer = styled.div`
   display: flex;
   align-items: center;
-`
-
-const PrimaryButton = styled.button`
-  padding: .5rem;
-  background-color: #343a40;
-  border: none;
-  border-radius: .25rem;
-  font-size: 1rem;
-  color: #f8f9fa;
-
-  :hover {
-    background-color: #212529;
-    cursor: pointer;
-  }
-  `
-
-const ErrorContainer = styled.div`
-  margin-left: 1rem;
-  padding: .5rem;
-  background-color: #ffe3e3;
-  border: 1px solid #ff8787;
-  border-radius: .25rem; 
-  color: #c92a2a;
 `
 
 function AddRow ({
@@ -77,16 +56,16 @@ function AddRow ({
 
   return (
     <AddRowContainer>
-      <PrimaryButton
+      <BaseButton
         data-testid='datatable-add'
         onClick={handleClick}
       >
         {buttonText}
-      </PrimaryButton>
+      </BaseButton>
 
       {(loading) && 'Loading...'}
 
-      {error && <ErrorContainer>{error}</ErrorContainer>}
+      {error && <ErrorBlock>{error}</ErrorBlock>}
     </AddRowContainer>
   )
 }

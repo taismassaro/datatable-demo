@@ -1,4 +1,5 @@
 import React from 'react'
+import { BaseButton } from './styled/Button'
 import { RowActionComponentProps } from './types'
 
 function RowAction ({
@@ -13,9 +14,9 @@ function RowAction ({
   }
 
   return (
-    <button onClick={handleClick} disabled={disabled}>
+    <BaseButton onClick={handleClick} disabled={disabled}>
       {label}
-    </button>
+    </BaseButton>
   )
 }
 

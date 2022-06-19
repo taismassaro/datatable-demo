@@ -1,11 +1,11 @@
 import React from 'react'
-import { format } from 'date-fns'
 import { useMutation } from '@apollo/client'
+import { format } from 'date-fns'
+import styled from 'styled-components'
 import * as yup from 'yup'
 import { DataTable, TableHeadCell, TableBodyCell } from './components'
 import { GET_CREDENTIALS, CREATE_CREDENTIAL, DELETE_CREDENTIAL } from './queries'
 import { QueryResult, Credential, DeleteCredentialVariables } from './types'
-import styled from 'styled-components'
 
 const RootContainer = styled.main`
   padding: 2rem;

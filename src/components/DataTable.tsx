@@ -1,25 +1,14 @@
 import React, { useState } from 'react'
 import { useQuery } from '@apollo/client'
-import Pagination from './Pagination'
-import { DataTableProps } from './types'
-import RowAction from './RowAction'
-import AddRow from './AddRow'
 import styled from 'styled-components'
+import { LoadingOverlay } from './styled/LoadingOverlay'
+import { SpacerVertical } from './styled/Spacer'
+import { DataTableProps } from './types'
+import AddRow from './AddRow'
+import RowAction from './RowAction'
+import Pagination from './Pagination'
 
 const PAGE_SIZE = 10
-
-const LoadingOverlay = styled.div`
-  display: flex;
-  justify-content: center;
-  position: absolute;
-  z-index: 1;
-  top: 0;
-  left: 0;
-  bottom: 0;
-  right: 0;
-  background-color: white;
-  opacity: 0.5;
-`
 
 const DataTableContainer = styled.div`
   position: relative;
@@ -66,10 +55,6 @@ export const TableHeadCell = styled.th`
 
 export const TableBodyCell = styled.td`
   padding: .5rem 0;
-`
-
-const SpacerVertical = styled.div`
-  height: 1rem;
 `
 
 function DataTable ({
