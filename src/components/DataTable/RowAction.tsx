@@ -9,7 +9,7 @@ const RowAction = ({
 }: RowActionComponentProps) => {
 
   const handleClick = () => {
-      onConfirm({ variables: rowData.variables })
+    onConfirm({ variables: rowData.variables })
   }
 
   return (

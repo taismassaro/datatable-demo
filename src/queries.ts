@@ -20,30 +20,10 @@ export const CREATE_CREDENTIAL = gql`
   }
 `
 
-// export const DELETE_CREDENTIAL = gql`
-//   mutation DeleteCredential($credentialId: ID!) {
-//     disableApiCredentials(credentialId: $credentialId) {
-//       id
-//     }
-//   }
-// `
-
-export const CREATE_POST = gql`
-  mutation (
-    $input: CreatePostInput!
-  ) {
-    createPost(input: $input) {
+export const DELETE_CREDENTIAL = gql`
+  mutation DeleteCredential($credentialId: ID!) {
+    deleteCredential(credentialId: $credentialId) {
       id
-      title
-      body
     }
-  }
-`
-
-export const DELETE_POST = gql`
-  mutation (
-    $id: ID!
-  ) {
-    deletePost(id: $id)
   }
 `

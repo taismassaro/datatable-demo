@@ -4,10 +4,10 @@ import React from 'react'
 import { useMutation } from '@apollo/client'
 import * as yup from 'yup'
 import { DataTable } from './components'
-import { DELETE_POST, GET_CREDENTIALS, CREATE_CREDENTIAL } from './queries'
+import { GET_CREDENTIALS, CREATE_CREDENTIAL, DELETE_CREDENTIAL } from './queries'
 import { format } from 'date-fns'
 
-type DeletePostVariables = {
+type DeleteCredentialVariables = {
   id: string
 }
 
@@ -63,14 +63,14 @@ function mapQueryToTable (data: QueryResult) {
 }
 
 function App() {
-  const [deletePost, {
-    loading: deletePostLoading
-  }] = useMutation(DELETE_POST) 
+  const [deleteCredential, {
+    loading: deleteCredentialLoading
+  }] = useMutation(DELETE_CREDENTIAL) 
 
-  function handleDeletePost ({ id }: DeletePostVariables) {
-    deletePost({
+  function handleDeleteCredential ({ id }: DeleteCredentialVariables) {
+    deleteCredential({
       variables: {
-        id
+        credentialId: id
       },
       refetchQueries: [{ query: GET_CREDENTIALS }]
     })
@@ -94,9 +94,9 @@ function App() {
           })
         }}
         rowAction={{
-          label: 'Delete post',
-          loading: deletePostLoading,
-          action: handleDeletePost,
+          label: 'Delete credential',
+          loading: deleteCredentialLoading,
+          action: handleDeleteCredential,
         }}
       />
     </main>
