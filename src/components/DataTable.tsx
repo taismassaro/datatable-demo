@@ -45,7 +45,7 @@ const TableBody = styled.tbody`
 `
 
 const TableRow = styled.tr`
-  height: 2rem;
+  height: 3.5rem;
 `
 
 export const TableHeadCell = styled.th`

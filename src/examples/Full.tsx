@@ -3,19 +3,9 @@ import { useMutation } from '@apollo/client'
 import { format } from 'date-fns'
 import styled from 'styled-components'
 import * as yup from 'yup'
-import { DataTable, TableHeadCell, TableBodyCell } from './components'
-import { GET_CREDENTIALS, CREATE_CREDENTIAL, DELETE_CREDENTIAL } from './queries'
-import { QueryResult, Credential, DeleteCredentialVariables } from './types'
-
-const RootContainer = styled.main`
-  padding: 2rem;
-  background-color: #f1f3f5;
-  height: 100%;
-`
-
-const Header = styled.header`
-  text-align: center;
-`
+import { DataTable, TableHeadCell, TableBodyCell } from '../components'
+import { GET_CREDENTIALS, CREATE_CREDENTIAL, DELETE_CREDENTIAL } from '../queries'
+import { QueryResult, Credential, DeleteCredentialVariables } from '../types'
 
 function mapQueryToTable (data: QueryResult) {
   const head = (
@@ -58,7 +48,7 @@ function mapQueryToTable (data: QueryResult) {
   }
 }
 
-function Demo () {
+function FullExample () {
   const [deleteCredential, {
     loading: deleteCredentialLoading
   }] = useMutation(DELETE_CREDENTIAL) 
@@ -73,10 +63,8 @@ function Demo () {
   }
 
   return (
-    <RootContainer>
-      <Header>
-        <h1>DataTable demo</h1>
-      </Header>
+    <>
+      <h2>With ability to add new rows (including validation) and perform mutation on row data</h2>
 
       <DataTable
         queryGetItems={GET_CREDENTIALS}
@@ -95,8 +83,8 @@ function Demo () {
           action: handleDeleteCredential,
         }}
       />
-    </RootContainer>
+      </>
   )
 }
 
-export default Demo
+export default FullExample
