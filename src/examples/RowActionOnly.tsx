@@ -20,9 +20,6 @@ function mapQueryToTable (data: QueryResult) {
 
   const body = credentials.map((credential: Credential) => {
     return {
-      data: {
-        id: credential.id
-      },
       content: (
         <>
           <TableBodyCell>{credential.id}</TableBodyCell>

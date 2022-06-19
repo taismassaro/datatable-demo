@@ -1,236 +1,35 @@
-# Settings Toolkit
-
-The Settings Toolkit is a set of components intended for building settings' pages in Merchant Portal. These components should make it easy for all teams to implement high-quality, maintainable settings without huge engineering efforts.
-
-Layout components will help you give a unified look and feel in your settings pages with no effort.
-
-Forms can be easily built using the toolkit wrappers provided here, and you can use all the field components from the support library `formik-fields`.
-
----
-
-- [Form Components](#form-components)
-  - [DataTable](#datatable)
-
----
-
-## Form Components
-
-We use [Formik](https://formik.org/docs/overview) to manage the state of our forms, which means that each field is identified by a name and automatically hooked up to validation, error-reporting and data fetching. We provide field components that can be used with formik, these are thin wrappers around bubble-ui components so the bubble-ui documentation still applies. For validation we use [yup](https://github.com/jquense/yup) validation schemas.
-
-On top of this, we added an abstraction for dataloading and form submissions. The settings backend uses graphql, so you will have to add one graphql query for loading the initial data, and one graphql mutation for submitting your form.
-
-The result of your graphql query can be transformed with `mapQueryToFormik`. You should return an object where each key is a fieldname and the value is your initial field value (nesting is possible).
-![data fetching with mapQueryToFormik](./assets/mapQueryToFormik.png)
-
-In case of the mutation you have to pass a function that gets your formik state as an input (`mapFormikToMutationInput`) and maps it into mutation variables. This makes it possible to transform your form state during submit.
-![form submission with mapFormikToMutationInput](./assets/mapFormikToMutationInput.png)
-
 # DataTable
 
-Use this component to render a table and populate it with data from a GraphQL API.
-An example of usage is the API Credentials page.
+Reusable React component with GraphQL superpowers 💪🏼
 
-## Simple DataTable
+- [The problem](#the-problem)
+- [The solution](#the-solution)
+- [Examples](#examples)
+- [To be improved](#to-be-improved)
 
-```jsx
-import { DataTable } from "./toolkit";
+## The problem
 
-/* GraphQL query used to load table data */
-const GET_DATA = gql`
-  query getData($merchantId: String!) {
-    getData {
-      value1
-      value2
-    }
-  }
-`;
+The team I was working in at the time had just inherited an application containing several pages that looked and behaved pretty similar: all of them had a table to list data from an API, most had a button to add new items to the table and/or a button to perform an action (like deleting or disabling) on each row. Because each page had been implemented individually, we faced a lot of code duplication and unnecessary complexity to keep these pages consistent.
 
-/* 
-  Function that maps data returned from query 
-  into a format that can be used by the DataTable.
-  For more info on `head` and `body` properties see 
-  https://s3.int.klarna.net/meta/mp-ui/master/?path=/docs/components-table--simple-table (mp-ui documentation)
-*/
-function mapQueryToTableRows(data) {
-  const head = {
-    colum1: "First column",
-    column2: "Second column",
-  };
-  const body = [
-    {
-      column1: {
-        type: TableBodyCellType.text,
-        text: data.value1,
-      },
-      column2: {
-        type: TableBodyCellType.text,
-        text: data.value2,
-      },
-    },
-  ];
-  return {
-    head,
-    body,
-  };
-}
+## The solution
 
-<DataTable
-  queryGetItems={GET_DATA}
-  queryVariables={{ merchantId: "K0001" }}
-  emptyTableText="No data to show here"
-  mapQueryToTableRows={mapQueryToTableRows}
-/>;
-```
+We solved the duplication problem by creating a modular reusable DataTable component that could be composed to recreate each of the existing pages. It can be used to simply list the data, and it can render buttons to perform actions on the table based on the provided props. It also supports validation for adding new items, using a [yup](https://github.com/jquense/yup) schema.
 
-![Simple Data Table](https://user-images.githubusercontent.com/16339834/105199294-eac7e180-5b3e-11eb-9c43-1ae66e644cc6.png)
+As part of our efforts to improve consistency and maintainability for this application, we created a backend-for-frontend service to use GraphQL and unify how the data could be fetched and mutated. This allowed us to abstract the API logic from the pages and make the component handle the fetching of data and adding new items based on GraphQL queries and mutations that can be passed as props.
 
-## DataTable with Add button
+## Examples
 
-```jsx
-import { DataTable } from "./toolkit";
-import * as yup from "yup";
+You can find examples of implementation of the different modules in the [examples](./src/examples/) folder.
 
-const GET_DATA = gql`
-  query getData($merchantId: String!) {
-    getData {
-      value1
-      value2
-    }
-  }
-`;
+For the purpose of these demos, I've created a mocked GraphQL [schema](./src/api/schema.ts) to generate and manipulate dummy data.
 
-/* GraphQL mutation to add a new data item */
-const ADD_ITEM = gql`
-  mutation AddItem($merchantId: String!) {
-    addItem(input: { merchantId: $merchantId }) {
-      id
-    }
-  }
-`;
+To check these out in the browser, run `yarn && yarn dev` after cloning this repository. The demo app will be available on [http://localhost:3000/](http://localhost:3000/)
 
-function mapQueryToTableRows(data) {
-  const head = {
-    colum1: "First column",
-    column2: "Second column",
-  };
-  const body = [
-    {
-      column1: {
-        type: TableBodyCellType.text,
-        text: data.value1,
-      },
-      column2: {
-        type: TableBodyCellType.text,
-        text: data.value2,
-      },
-    },
-  ];
-  return {
-    head,
-    body,
-    /* 
-      Data to run against validation schema before 
-      performing the mutation to add a new item to the table 
-    */
-    validationData: {
-      maxItems: body.length,
-    },
-  };
-}
+## To be improved
 
-<DataTable
-  queryGetItems={GET_DATA}
-  queryVariables={{ merchantId: "K0001" }}
-  emptyTableText="No data to show here"
-  mapQueryToTableRows={mapQueryToTableRows}
-  addRow={{
-    buttonText: "AddItem",
-    mutation: ADD_ITEM,
-    variables: { merchantId: "K0001" },
-    /*
-      Yup schema to validate against
-    */
-    validationSchema: yup.object().shape({
-      maxItems: yup.number().max(5, "Validation error message"),
-    }),
-  }}
-/>;
-```
+This was the first time I wrote a truly reusable React component of this complexity and although it has been through a few iterations since it was created, there are still a few things to be improved:
 
-![DataTable with Add button](https://user-images.githubusercontent.com/16339834/105200980-a50c1880-5b40-11eb-9eab-c9fe5863fe9b.png)
-
-## DataTable with row action
-
-```jsx
-import { DataTable } from "./toolkit";
-import * as yup from "yup";
-
-const GET_DATA = gql`
-  query getData($merchantId: String!) {
-    getData {
-      value1
-      value2
-    }
-  }
-`;
-
-function mapQueryToTableRows(data) {
-  const head = {
-    colum1: "First column",
-    column2: "Second column",
-  };
-  const body = [
-    {
-      column1: {
-        type: TableBodyCellType.text,
-        text: data.value1,
-      },
-      column2: {
-        type: TableBodyCellType.text,
-        text: data.value2,
-      },
-      /*
-        Control whether the action should be visible for this row
-      */
-      rowActionParams: {
-        show: true,
-        /*
-          Variables can also be passed here in case 
-          they're needed for the action
-        */
-        variables: {},
-      },
-    },
-  ];
-  return {
-    head,
-    body,
-    /* 
-      Data to run against validation schema before 
-      performing the mutation to add a new item to the table 
-    */
-    validationData: {
-      maxItems: body.length,
-    },
-  };
-}
-
-function handleRowAction() {
-  /* 
-    Action to be performed. Ideally a GraphQL mutation.
-  */
-}
-
-<DataTable
-  queryGetItems={GET_DATA}
-  queryVariables={{ merchantId: "K0001" }}
-  emptyTableText="No data to show here"
-  mapQueryToTableRows={mapQueryToTableRows}
-  rowAction={{
-    label: "Action",
-    action: handleRowAction,
-  }}
-/>;
-```
-
-![DataTable with row action](https://user-images.githubusercontent.com/16339834/105202097-e650f800-5b41-11eb-9ce2-978ef0b9ac9a.png)
+- [ ] **Make it responsive**: it was created for a web desktop application so there wasn't much focus on responsiveness, but it would be great to make it more universal.
+- [ ] **Improve accessibility**: unfortunately I haven't paid much attention to accessibility either, and it would be a good opportunity to learn some best practices to incorporate in my workflow.
+- [ ] **Refactor into compound components**: the current implementation is pretty complex as everything is controlled via props passed to the parent DataTable component. I think it could improve readability to separate the `AddRow` and the `RowAction` modules into child components with a shared state.
+- [ ] **Styling**: the original implementation used an internal UI library for styling, which I had to remove and replaced with regular HTML elements and some basic CSS. Maybe creating CSS variables or themes so that the design can be adjusted by the consumer?
