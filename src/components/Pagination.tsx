@@ -32,19 +32,22 @@ function Pagination ({
   return (
     <PaginationContainer>
       {total > 0 &&
-        <>
+        <span>
           {`${currentPageStart}–${currentPageEnd} of ${total}`}
-        </>}
-        <SpacerHorizontal />
+        </span>
+      }
+      <SpacerHorizontal />
       <BaseButton
         disabled={currentPage <= 1 || total === 0}
         onClick={handleGoToPrevious}
+        aria-label="Go to previous page"
       >
         {'<'}
       </BaseButton>
       <BaseButton
         disabled={currentPage === lastPage || total === 0}
         onClick={handleGoToNext}
+        aria-label="Go to next page"
       >
         {'>'}
       </BaseButton>
