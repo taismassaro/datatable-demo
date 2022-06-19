@@ -3,7 +3,6 @@
 import React from 'react'
 import { useMutation } from '@apollo/client'
 import * as yup from 'yup'
-import './App.css'
 import { DataTable } from './components'
 import { GET_POSTS, CREATE_POST, DELETE_POST } from './queries'
 import { loremIpsum } from 'lorem-ipsum'
